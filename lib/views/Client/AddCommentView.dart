@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
+import '../../models/TypeOfComplaint.dart';
 class AddCommentView extends StatefulWidget {
   const AddCommentView({super.key});
 
@@ -9,13 +13,34 @@ class AddCommentView extends StatefulWidget {
 
 class _AddCommentViewState extends State<AddCommentView> {
   //DATOS QUE IRAN EN EL DROPDOWN
-  List<String> items= [
-    "Item 1",
-    "Item 2",
-    "Item 3",
-    "Item 4",
-  ];
-  String selectedItem = 'Item 1';
+  List<TypeOfComplaint> items = [];
+  TypeOfComplaint? selectedItem;
+
+  Future<List<TypeOfComplaint>> fetchData() async {
+    final url = 'http://20.150.216.134:7070/api/v1/typeofcomplaint';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((item) => TypeOfComplaint.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al obtener los datos de la API');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData().then((data) {
+      setState(() {
+        items = data;
+        selectedItem = data.isNotEmpty ? data[0] : null;
+      });
+    }).catchError((error) {
+      print('Error: $error');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +89,17 @@ class _AddCommentViewState extends State<AddCommentView> {
                         borderSide: BorderSide(width:1,color:Color(0xffC8A1FF))
                     ),
                   ),
-                  value: selectedItem,
-                  items:items
-                      .map((item)=>DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item,style:TextStyle(fontSize: 15)),
-                  ))
-                    .toList(),
-                  onChanged: (item)=>setState(()=> selectedItem = item!),
-                )
+                  value: selectedItem?.name,
+                  items: items.map((item) => DropdownMenuItem<String>(
+                    value: item.name,
+                    child: Text(item.name, style: TextStyle(fontSize: 15)),
+                  )).toList(),
+                  onChanged:(value){
+                    setState(() {
+                      selectedItem = items.firstWhere((item) => item.name == value);
+                    });
+                  },
+                ),
               ),
             ],
           ),
