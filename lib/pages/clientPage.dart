@@ -15,7 +15,12 @@ class ClientPage extends StatefulWidget {
 }
 
 class _ClientPageState extends State<ClientPage> {
+  final items=[
+    Icon(Icons.home, color: Colors.white),
+    Icon(Icons.comment, color: Colors.white),
+  ];
 
+  int index=0;
 
   late String codeSended;
   final code=TextEditingController();
@@ -36,6 +41,19 @@ class _ClientPageState extends State<ClientPage> {
     return SafeArea(
       child: Scaffold(
           appBar: CustomAppBar(username:"Client"),
+          bottomNavigationBar: CurvedNavigationBar(
+            height: 60,
+            backgroundColor: Colors.transparent,
+            color: Colors.deepPurple,
+            items: items,
+            index: index,
+            onTap: (index){
+              setState(() {
+                this.index=index;
+              });
+            },
+            animationDuration: Duration(milliseconds: 300),
+          ),
           body:Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
