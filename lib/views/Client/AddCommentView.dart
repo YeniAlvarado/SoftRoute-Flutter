@@ -2,8 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+<<<<<<< Updated upstream
 
 import '../../models/TypeOfComplaint.dart';
+=======
+import 'package:http/http.dart' as http;
+import '../../models/Feedback.dart';
+
+>>>>>>> Stashed changes
 class AddCommentView extends StatefulWidget {
   const AddCommentView({super.key});
 
