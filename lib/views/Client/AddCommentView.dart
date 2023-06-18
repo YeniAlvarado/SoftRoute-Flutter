@@ -2,14 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-<<<<<<< Updated upstream
-
 import '../../models/TypeOfComplaint.dart';
-=======
-import 'package:http/http.dart' as http;
-import '../../models/Feedback.dart';
+import '../../models/FeedbackCliente.dart';
 
->>>>>>> Stashed changes
+
 class AddCommentView extends StatefulWidget {
   const AddCommentView({super.key});
 
@@ -18,6 +14,40 @@ class AddCommentView extends StatefulWidget {
 }
 
 class _AddCommentViewState extends State<AddCommentView> {
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _typeOfComplaintIdController = TextEditingController();
+  final TextEditingController _shipmentIdController = TextEditingController();
+  Future<void> addComment() async { try {
+    final feedbackCliente = FeedbackCliente(
+      date: DateTime.now().toString(),
+      description: _descriptionController.text,
+      typeOfComplaintId: int.parse(selectedItem?.id.toString() ?? ''),
+      shipmentId: int.parse(_shipmentIdController.text),
+    );
+    print(feedbackCliente.typeOfComplaintId);
+    print(feedbackCliente.shipmentId);
+    print(feedbackCliente.description);
+    print(feedbackCliente.date);
+
+    final url = Uri.parse('http://20.150.216.134:7070/api/v1/feedback');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(feedbackCliente),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Comentario enviado con éxito');
+    } else {
+      print('Error al enviar el comentario');
+    }
+}catch (error) {
+    print('Error en la solicitud POST: $error');
+
+  }
+  }
   //DATOS QUE IRAN EN EL DROPDOWN
   List<TypeOfComplaint> items = [];
   TypeOfComplaint? selectedItem;
@@ -35,6 +65,7 @@ class _AddCommentViewState extends State<AddCommentView> {
     }
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +78,6 @@ class _AddCommentViewState extends State<AddCommentView> {
       print('Error: $error');
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +142,7 @@ class _AddCommentViewState extends State<AddCommentView> {
           const SizedBox(height: 20,),
 
           TextField(
+            controller: _descriptionController,
             decoration: InputDecoration(
               filled: true,
               border: OutlineInputBorder(
@@ -130,15 +161,30 @@ class _AddCommentViewState extends State<AddCommentView> {
             ),
           ),
           const SizedBox(height: 20,),
+          TextField(
+            controller: _shipmentIdController,
+            decoration: InputDecoration(
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(width: 1, color: Color(0xFFC8A1FF)),
+              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 15),
+              hintText: 'Enter ShipmentId',
+              hintStyle: TextStyle(color: Colors.black),
+            ),
+          ),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
               width: 150,
               height: 40,
               child: ElevatedButton(
-                onPressed: (){
-                  //agregar accion al boton
-                },
+                onPressed: addComment,
                 child: const Text("Send"),
                 style: ElevatedButton.styleFrom(
                   primary: const Color(0xffC8A1FF),
